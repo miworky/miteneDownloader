@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Mitene file DL</title>
+ </head>
+<body>
+<script type="text/javascript" language="javascript" charset="utf-8" src="mitene.js"></script>
+
+
+<input type="button" value="Download All" id="ButtonDownloadAll">
+<input type="button" value="reload" onclick="window.location.reload();" />
+
+<P>
+
+
+<pre id="output"></pre>
+
+
+<script>
+
+let gl_allFiles = [];
+
+async function onClickDownloadAll(){
+    await window.api.send("downloadAll", gl_allFiles );
+}
+
+
+function fixFilename(string) {
+   const fixed1 = string.replace(/:/g, '');
+   const fixed2 = fixed1.replace("+0900", '');
+
+   return fixed2;
+}
+
+
+
+function makeLink(url, fileName, username){
+
+  let a = document.createElement("A");
+  a.href = url;
+  a.download = fileName;
+  a.innerText = fileName;
+  document.body.appendChild( a );
+
+  let user = document.createElement("A");
+  user.innerText = " " + username;
+  document.body.appendChild( user );
+
+  let p = document.createElement("BR");
+  document.body.appendChild( p );
+
+}
+
+
+    window.onload = function() {
+      let button = document.getElementById('ButtonDownloadAll');
+      button.onclick = onClickDownloadAll;
+
+         const mediaFiles = gon.media["mediaFiles"];
+
+         const mediaFileNum = mediaFiles.length;
+         for (let mediaFileNo = 0;mediaFileNo < mediaFileNum;mediaFileNo++) {
+            const thisMediaFile = mediaFiles[mediaFileNo];
+            const uuid = thisMediaFile["uuid"];
+            const tookAt = thisMediaFile["tookAt"];
+            const hasComment = thisMediaFile["hasComment"];
+            let title = "";
+
+            if (hasComment) {
+               const comments = thisMediaFile["comments"];
+               const firstComment = comments[0];
+               title = firstComment["body"];
+            }
+
+            const mediaType = thisMediaFile["mediaType"];
+            const urlPhoto = thisMediaFile["expiringUrl"];
+            const urlMovie = thisMediaFile["expiringVideoUrl"];
+
+            let url;
+            let extention;
+            if (mediaType === "photo") {
+               url = urlPhoto;
+               extention = ".jpg"
+            }
+            else if (mediaType === "movie") {
+               url = urlMovie;
+               extention = ".mp4"
+            }
+
+            const filename = tookAt + "_" + title + extention;
+
+            let username;
+            const userId = thisMediaFile["userId"];
+            if (userId == "273590504899") {
+               username = "akihiro";
+            }
+            else if (userId == "876223580693") {
+               username = "tomomi";
+            }
+
+
+//            document.getElementById("output").innerHTML += mediaType + " " + filename + "  " + url + "\n";
+
+             const fileNameFixed = fixFilename(filename);
+
+            let file = {};
+            file["url"] = url;
+            file["filename"] = fileNameFixed;
+            gl_allFiles.push(file);
+
+            makeLink(url, fileNameFixed, username);
+
+         }
+
+
+
+    }
+
+</script>
+
+
+</body>
+
+</html>
+

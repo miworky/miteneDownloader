@@ -1,13 +1,28 @@
 {
-  "name": "electron",
+  "name": "miteneDownloader",
+  "author": "miworky",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "description": "Download mitene files",
   "devDependencies": {
     "electron": "^13.1.7",
     "electron-builder": "^22.11.7",
     "electron-packager": "^15.3.0",
     "fs-extra": "^10.0.0",
     "https": "^1.0.0"
+  },
+  "build": {
+     "appId": "com.miworky.miteneDownloader",
+     "productName": "miteneDownloader",
+     "files": [
+        "*.js",
+        "*.html"
+     ],
+     "asar": "false"
+  },
+  "scripts": {
+     "start": "electron .",
+     "build:win": "electron-builder --win --x64 --dir"
   }
 }

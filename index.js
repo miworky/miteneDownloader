@@ -48,6 +48,7 @@ app.on('window-all-closed', function () {
 
 // uriのファイルを filename としてダウンロードする
 const download = (uri, filename) => {
+console.log( filename );
   return new Promise((resolve, reject) =>
     https
       .request(uri, (res) => {
@@ -71,6 +72,10 @@ ipcMain.on('downloadAll', function( event, data){
             defaultPath: '.'
     });
 
+    if (downloadPath === undefined) {
+       // キャンセルされた
+       return;
+    }
 
     // ファイル数分ダウンロードする 
     const fileNum = data.length;
@@ -78,7 +83,7 @@ ipcMain.on('downloadAll', function( event, data){
        const url = data[fileNo]["url"];
        const filename = data[fileNo]["filename"];
 
-       console.log( filename );
+//       console.log( filename );
 //       console.log( url );
 
 

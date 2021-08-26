@@ -65,11 +65,12 @@ function makeLink(url, fileName, username){
 
 }
 
-
-    window.onload = function() {
+    function enableDownloadAllButton(enable) {
       let button = document.getElementById('ButtonDownloadAll');
-      button.onclick = onClickDownloadAll;
+      button.disabled = !enable;
     }
+
+
 
     function deleteAllLinks() {
          let linkToFiles = document.getElementById('linkToFiles');
@@ -77,13 +78,21 @@ function makeLink(url, fileName, username){
          // linkToFilesのすべての子要素を削除する
          var clone = linkToFiles.cloneNode( false );
          linkToFiles.parentNode.replaceChild( clone , linkToFiles );
-
     }
 
+    function deleteContents() {
+         gon = {};
+         gl_allFiles = [];
+    }
 
     function evalMitene() {
          // すでに追加されているリンクは削除する
          deleteAllLinks();
+
+         deleteContents();
+
+         // DownloadAllButtonを disable にする
+         enableDownloadAllButton(false);
 
          // みてねのソースの内容を評価する
          let element = document.getElementById('miteneSource');
@@ -143,9 +152,25 @@ function makeLink(url, fileName, username){
 
          }
 
+         // ファイルへのリンクが含まれていれば、DownloadAllButton を有効にする      
+         let isEnableDownloadAllButton = false;
+         if (0 < gl_allFiles.length) {
+            isEnableDownloadAllButton = true;
+         }
 
+         enableDownloadAllButton(isEnableDownloadAllButton);
 
     }
+
+
+
+    window.onload = function() {
+        let downloadAllbutton = document.getElementById('ButtonDownloadAll');
+        downloadAllbutton.onclick = onClickDownloadAll;
+
+        enableDownloadAllButton(false);
+    }
+
 
 </script>
 

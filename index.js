@@ -1,9 +1,8 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const https = require('https')
-
 
 function createWindow () {
   // Create the browser window.
@@ -47,7 +46,7 @@ app.on('window-all-closed', function () {
 
 
 
-
+// uriのファイルを filename としてダウンロードする
 const download = (uri, filename) => {
   return new Promise((resolve, reject) =>
     https
@@ -65,13 +64,16 @@ const download = (uri, filename) => {
 
 ipcMain.on('downloadAll', function( event, data){
 
-    const downloadPath = "downloads";
-    if (!fs.existsSync(downloadPath)) {
-        fs.mkdirSync(downloadPath);
-    }
+    // ダウンロード先のフォルダを選択するダイアログを表示する 
+    const downloadPath = dialog.showOpenDialogSync(null, {
+            properties: ['openDirectory'],
+            title: 'download to',
+            defaultPath: '.'
+    });
 
+
+    // ファイル数分ダウンロードする 
     const fileNum = data.length;
-
     for (let fileNo = 0;fileNo < fileNum;fileNo++) {
        const url = data[fileNo]["url"];
        const filename = data[fileNo]["filename"];

@@ -24,5 +24,6 @@
   "scripts": {
      "start": "electron .",
      "build:win": "electron-builder --win --x64 --dir"
+     "build:mac": "electron-builder --mac --x64 --dir"
   }
 }

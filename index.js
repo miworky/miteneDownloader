@@ -48,7 +48,6 @@ app.on('window-all-closed', function () {
 
 // uriのファイルを filename としてダウンロードする
 const download = (uri, filename) => {
-console.log( filename );
   return new Promise((resolve, reject) =>
     https
       .request(uri, (res) => {

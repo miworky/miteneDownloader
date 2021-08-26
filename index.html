@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <title>Mitene Downloader</title>
  </head>
 <body>
-<script type="text/javascript" language="javascript" charset="utf-8" src="mitene.js"></script>
 
+<label>みてねのソースの 3 行目（window.gonで始まる行）を以下にペーストして<BR>
+load ボタンを押してください<BR>
+<input type="text" size="40" id="miteneSource" value=""></label>
 
+<input type="button" value="load" onclick="evalMitene();" />
+
+<BR>
 <input type="button" value="Download All" id="ButtonDownloadAll">
-<input type="button" value="reload" onclick="window.location.reload();" />
+
+<BR>
+<label id="linkToFiles" ></label>
+
 
 <P>
 
@@ -17,6 +24,10 @@
 
 
 <script>
+
+
+
+
 
 let gl_allFiles = [];
 
@@ -36,18 +47,21 @@ function fixFilename(string) {
 
 function makeLink(url, fileName, username){
 
+  let linkToFiles = document.getElementById('linkToFiles');
+
+
   let a = document.createElement("A");
   a.href = url;
   a.download = fileName;
   a.innerText = fileName;
-  document.body.appendChild( a );
+  linkToFiles.appendChild( a );
 
   let user = document.createElement("A");
   user.innerText = " " + username;
-  document.body.appendChild( user );
+  linkToFiles.appendChild( user );
 
   let p = document.createElement("BR");
-  document.body.appendChild( p );
+  linkToFiles.appendChild( p );
 
 }
 
@@ -55,7 +69,30 @@ function makeLink(url, fileName, username){
     window.onload = function() {
       let button = document.getElementById('ButtonDownloadAll');
       button.onclick = onClickDownloadAll;
+    }
 
+    function deleteAllLinks() {
+         let linkToFiles = document.getElementById('linkToFiles');
+
+         // linkToFilesのすべての子要素を削除する
+         var clone = linkToFiles.cloneNode( false );
+         linkToFiles.parentNode.replaceChild( clone , linkToFiles );
+
+    }
+
+
+    function evalMitene() {
+         // すでに追加されているリンクは削除する
+         deleteAllLinks();
+
+         // みてねのソースの内容を評価する
+         let element = document.getElementById('miteneSource');
+         eval(element.value);
+
+         // これで、 gon 以下に、みてねのデータが追加される
+
+
+         // 追加されたデータを読み込む 
          const mediaFiles = gon.media["mediaFiles"];
 
          const mediaFileNum = mediaFiles.length;

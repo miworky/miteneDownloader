@@ -18,8 +18,7 @@
      "files": [
         "*.js",
         "*.html"
-     ],
-     "asar": "false"
+     ]
   },
   "scripts": {
      "start": "electron .",

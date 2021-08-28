@@ -13,6 +13,8 @@ load ボタンを押してください<BR>
 <BR>
 <input type="button" value="Download All" id="ButtonDownloadAll">
 
+<label id="messageArea" ></label>
+
 <BR>
 <label id="linkToFiles" ></label>
 
@@ -163,6 +165,9 @@ function makeLink(url, fileName, username){
     }
 
 
+    window.api.on('downloadProgress', (event, number)=>{
+      document.getElementById("messageArea").innerHTML = number;
+    });
 
     window.onload = function() {
         let downloadAllbutton = document.getElementById('ButtonDownloadAll');
@@ -170,6 +175,7 @@ function makeLink(url, fileName, username){
 
         enableDownloadAllButton(false);
     }
+
 
 
 </script>

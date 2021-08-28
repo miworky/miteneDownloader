@@ -4,6 +4,8 @@ const path = require('path')
 const fs = require('fs')
 const https = require('https')
 
+let gl_mainWindow;
+
 function createWindow () {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -13,6 +15,8 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js') 
     }
   })
+
+  gl_mainWindow = mainWindow;
 
   mainWindow.setMenuBarVisibility(false);
 
@@ -54,13 +58,17 @@ app.on('window-all-closed', function () {
 
 
 // uriのファイルを filename としてダウンロードする
-const download = (uri, filename) => {
+const download = (uri, filename, downloadProgress, fileNum) => {
   return new Promise((resolve, reject) =>
     https
       .request(uri, (res) => {
         res
           .pipe(fs.createWriteStream(filename))
-          .on("close", resolve)
+          .on("close", () => {
+             downloadProgress.finished = downloadProgress.finished + 1;
+             gl_mainWindow.webContents.send('downloadProgress', "downloading " + downloadProgress.finished.toString() + "/" + fileNum.toString());
+             resolve();
+           })
           .on("error", reject);
       })
       .end()
@@ -83,6 +91,10 @@ ipcMain.on('downloadAll', function( event, data){
        return;
     }
 
+
+    var downloadProgress = { finished: 0 };
+    let downloads = [];
+
     // ファイル数分ダウンロードする 
     const fileNum = data.length;
     for (let fileNo = 0;fileNo < fileNum;fileNo++) {
@@ -92,14 +104,22 @@ ipcMain.on('downloadAll', function( event, data){
 //       console.log( filename );
 //       console.log( url );
 
+       const downloadTo = downloadPath + "/" + filename;
+       const thisDownload = download(
+           url, downloadTo, downloadProgress, fileNum
+       );
 
-       download(
-           url, downloadPath + "/" + filename
-       ).then(() => console.log("done"));
-
+       downloads.push(thisDownload);
     }
 
+    Promise.all(downloads).then(() => { gl_mainWindow.webContents.send('downloadProgress', fileNum.toString() + " files were downloaded.");
+    });
+
 })
+
+
+
+
 
 
 

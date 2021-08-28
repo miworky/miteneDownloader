@@ -14,6 +14,13 @@ function createWindow () {
     }
   })
 
+  mainWindow.setMenuBarVisibility(false);
+
+  const package_version = process.env.npm_package_version;
+  const package_name = process.env.npm_package_name;
+  const title = package_name + " " + package_version;
+  mainWindow.setTitle(title);
+
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 

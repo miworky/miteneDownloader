@@ -6,12 +6,12 @@
 
 <label>みてねのソースの 3 行目（window.gonで始まる行）を以下にペーストして<BR>
 load ボタンを押してください<BR>
-<input type="text" size="40" id="miteneSource" value=""></label>
+<input type="text" size="40" id="miteneSource" value="" />
 
-<input type="button" value="load" onclick="evalMitene();" />
+<input type="button" value="load" onclick="onClickLoadButton();" id="ButtonLoad" />
 
 <BR>
-<input type="button" value="Download All" id="ButtonDownloadAll">
+<input type="button" value="Download All" onclick="onClickDownloadAll();" id="ButtonDownloadAll" />
 
 <label id="messageArea" ></label>
 
@@ -33,9 +33,30 @@ load ボタンを押してください<BR>
 
 let gl_allFiles = [];
 
-async function onClickDownloadAll(){
-    await window.api.send("downloadAll", gl_allFiles );
+function enableInputs(enable) {
+   document.getElementById('miteneSource').disabled = !enable;
+   document.getElementById('ButtonLoad').disabled = !enable;
+   document.getElementById('ButtonDownloadAll').disabled = !enable;
+
 }
+
+function startDownloading() {
+   enableInputs(false);
+}
+
+function finishDownloading() {
+   enableInputs(true);
+}
+
+function onClickLoadButton(){
+  showMessage("");
+  evalMitene();
+}
+
+function onClickDownloadAll(){
+    window.api.send("downloadAll", gl_allFiles );
+}
+
 
 
 function fixFilename(string) {
@@ -164,15 +185,25 @@ function makeLink(url, fileName, username){
 
     }
 
+    function showMessage(message) {
+      document.getElementById("messageArea").innerHTML = message;
+    }
+
+    window.api.on('startDownloading', (event, number)=>{
+      startDownloading();
+      showMessage(number);
+    });
 
     window.api.on('downloadProgress', (event, number)=>{
-      document.getElementById("messageArea").innerHTML = number;
+      showMessage(number);
+    });
+
+    window.api.on('finishDownloading', (event, number)=>{
+      showMessage(number);
+      finishDownloading();
     });
 
     window.onload = function() {
-        let downloadAllbutton = document.getElementById('ButtonDownloadAll');
-        downloadAllbutton.onclick = onClickDownloadAll;
-
         enableDownloadAllButton(false);
     }
 

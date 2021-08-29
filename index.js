@@ -91,7 +91,6 @@ ipcMain.on('downloadAll', function( event, data){
        return;
     }
 
-
     var downloadProgress = { finished: 0 };
     let downloads = [];
 
@@ -112,7 +111,10 @@ ipcMain.on('downloadAll', function( event, data){
        downloads.push(thisDownload);
     }
 
-    Promise.all(downloads).then(() => { gl_mainWindow.webContents.send('downloadProgress', fileNum.toString() + " files were downloaded.");
+    // ダウンロード開始
+    gl_mainWindow.webContents.send('startDownloading', fileNum.toString() + " files will be downloaded.");
+
+    Promise.all(downloads).then(() => { gl_mainWindow.webContents.send('finishDownloading', fileNum.toString() + " files were downloaded.");
     });
 
 })

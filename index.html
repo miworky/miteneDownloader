@@ -191,17 +191,19 @@ function makeLink(url, fileName, username){
       document.getElementById("messageArea").innerHTML = message;
     }
 
-    window.api.on('startDownloading', (event, number)=>{
+    // ---------------------------------------------------
+    // Main process からの通知を受け取る関数
+    window.api.on('startDownloading', (event, argv)=>{
       startDownloading();
-      showMessage(number);
+      showMessage(argv);
     });
 
-    window.api.on('downloadProgress', (event, number)=>{
-      showMessage(number);
+    window.api.on('downloadProgress', (event, argv)=>{
+      showMessage(argv);
     });
 
-    window.api.on('finishDownloading', (event, number)=>{
-      showMessage(number);
+    window.api.on('finishDownloading', (event, argv)=>{
+      showMessage(argv);
       finishDownloading();
     });
 

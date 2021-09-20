@@ -60,8 +60,10 @@ function onClickDownloadAll(){
 
 
 function fixFilename(string) {
-   const fixed1 = string.replace(/:/g, '');
-   const fixed2 = fixed1.replace("+0900", '');
+   // stringのうち、日付に相当する部分は YYYY-MM-DDTHH:mm:SS+09:00 の形式になっている
+   // : と + はファイル名には使えないので削除する
+   const fixed1 = string.replace("+09:00", '');  // TODO これだとタイムゾーンが変わったときにうまくいかない
+   const fixed2 = fixed1.replace(/:/g, '');
 
    return fixed2;
 }

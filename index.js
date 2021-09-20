@@ -4,8 +4,6 @@ const path = require('path')
 const fs = require('fs')
 const https = require('https')
 
-let gl_mainWindow;
-
 function createWindow () {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -15,8 +13,6 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js') 
     }
   })
-
-  gl_mainWindow = mainWindow;
 
   mainWindow.setMenuBarVisibility(false);
 
@@ -58,15 +54,21 @@ app.on('window-all-closed', function () {
 
 
 // uriのファイルを filename としてダウンロードする
-const download = (uri, filename, downloadProgress, fileNum) => {
+const download = (event, uri, filename, downloadProgress, fileNum) => {
   return new Promise((resolve, reject) =>
     https
       .request(uri, (res) => {
         res
           .pipe(fs.createWriteStream(filename))
           .on("close", () => {
+             // 1つダウンロード完了した
+
+             // ダウンロード完了したファイルの個数をカウントアップ
              downloadProgress.finished = downloadProgress.finished + 1;
-             gl_mainWindow.webContents.send('downloadProgress', "downloading " + downloadProgress.finished.toString() + "/" + fileNum.toString());
+
+             // レンダラープロセスにその旨通知
+             event.reply('downloadProgress', "downloading " + downloadProgress.finished.toString() + "/" + fileNum.toString());
+
              resolve();
            })
           .on("error", reject);
@@ -92,9 +94,9 @@ ipcMain.on('downloadAll', function( event, data){
     }
 
     var downloadProgress = { finished: 0 };
-    let downloads = [];
+    let downloads = [];  // ダウンロードするファイルの個数分の Promise を格納する配列
 
-    // ファイル数分ダウンロードする 
+    // ファイル数分ダウンロードする Promise を生成する（まだダウンロードはしない）
     const fileNum = data.length;
     for (let fileNo = 0;fileNo < fileNum;fileNo++) {
        const url = data[fileNo]["url"];
@@ -105,16 +107,19 @@ ipcMain.on('downloadAll', function( event, data){
 
        const downloadTo = downloadPath + "/" + filename;
        const thisDownload = download(
-           url, downloadTo, downloadProgress, fileNum
+           event, url, downloadTo, downloadProgress, fileNum
        );
 
        downloads.push(thisDownload);
     }
 
-    // ダウンロード開始
-    gl_mainWindow.webContents.send('startDownloading', fileNum.toString() + " files will be downloaded.");
+    // ダウンロード開始をレンダラープロセスに通知
+    event.reply('startDownloading', fileNum.toString() + " files will be downloaded.");
 
-    Promise.all(downloads).then(() => { gl_mainWindow.webContents.send('finishDownloading', fileNum.toString() + " files were downloaded.");
+    // まとめてダウンロード開始
+    Promise.all(downloads).then(() => { 
+        // すべてのダウンロードが完了したら、その旨をレンダラープロセスに通知
+        event.reply('finishDownloading', fileNum.toString() + " files were downloaded.");
     });
 
 })

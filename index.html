@@ -31,64 +31,64 @@ load ボタンを押してください<BR>
 
 
 
-let gl_allFiles = [];
+    let gl_allFiles = [];
 
-function enableInputs(enable) {
-   document.getElementById('miteneSource').disabled = !enable;
-   document.getElementById('ButtonLoad').disabled = !enable;
-   document.getElementById('ButtonDownloadAll').disabled = !enable;
+    function enableInputs(enable) {
+       document.getElementById('miteneSource').disabled = !enable;
+       document.getElementById('ButtonLoad').disabled = !enable;
+       document.getElementById('ButtonDownloadAll').disabled = !enable;
 
-}
+    }
 
-function startDownloading() {
-   enableInputs(false);
-}
+    function startDownloading() {
+       enableInputs(false);
+    }
 
-function finishDownloading() {
-   enableInputs(true);
-}
+    function finishDownloading() {
+       enableInputs(true);
+    }
 
-function onClickLoadButton(){
-  showMessage("");
-  evalMitene();
-}
+    function onClickLoadButton(){
+      showMessage("");
+      evalMitene();
+    }
 
-function onClickDownloadAll(){
-    window.api.send("downloadAll", gl_allFiles );
-}
-
-
-
-function fixFilename(string) {
-   // stringのうち、日付に相当する部分は YYYY-MM-DDTHH:mm:SS+09:00 の形式になっている
-   // : と + はファイル名には使えないので削除する
-   const fixed1 = string.replace("+09:00", '');  // TODO これだとタイムゾーンが変わったときにうまくいかない
-   const fixed2 = fixed1.replace(/:/g, '');
-
-   return fixed2;
-}
+    function onClickDownloadAll(){
+        window.api.send("downloadAll", gl_allFiles );
+    }
 
 
 
-function makeLink(url, fileName, username){
+    function fixFilename(string) {
+       // stringのうち、日付に相当する部分は YYYY-MM-DDTHH:mm:SS+09:00 の形式になっている
+       // : と + はファイル名には使えないので削除する
+       const fixed1 = string.replace("+09:00", '');  // TODO これだとタイムゾーンが変わったときにうまくいかない
+       const fixed2 = fixed1.replace(/:/g, '');
 
-  let linkToFiles = document.getElementById('linkToFiles');
+       return fixed2;
+    }
 
 
-  let a = document.createElement("A");
-  a.href = url;
-  a.download = fileName;
-  a.innerText = fileName;
-  linkToFiles.appendChild( a );
 
-  let user = document.createElement("A");
-  user.innerText = " " + username;
-  linkToFiles.appendChild( user );
+    function makeLink(url, fileName, username){
 
-  let p = document.createElement("BR");
-  linkToFiles.appendChild( p );
+      let linkToFiles = document.getElementById('linkToFiles');
 
-}
+
+      let a = document.createElement("A");
+      a.href = url;
+      a.download = fileName;
+      a.innerText = fileName;
+      linkToFiles.appendChild( a );
+
+      let user = document.createElement("A");
+      user.innerText = " " + username;
+      linkToFiles.appendChild( user );
+
+      let p = document.createElement("BR");
+      linkToFiles.appendChild( p );
+
+    }
 
     function enableDownloadAllButton(enable) {
       let button = document.getElementById('ButtonDownloadAll');

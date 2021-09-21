@@ -93,7 +93,7 @@ ipcMain.on('downloadAll', function( event, data){
        return;
     }
 
-    var downloadProgress = { finished: 0 };
+    let downloadProgress = { finished: 0 };
     let downloads = [];  // ダウンロードするファイルの個数分の Promise を格納する配列
 
     // ファイル数分ダウンロードする Promise を生成する（まだダウンロードはしない）

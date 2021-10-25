@@ -4,8 +4,7 @@
  </head>
 <body>
 
-<label>みてねのソースの 3 行目（window.gonで始まる行）を以下にペーストして<BR>
-load ボタンを押してください<BR>
+<label id="description"></label>
 <input type="text" size="40" id="miteneSource" value="" />
 
 <input type="button" value="load" onclick="onClickLoadButton();" id="ButtonLoad" />
@@ -28,10 +27,33 @@ load ボタンを押してください<BR>
 <script>
 
 
-
-
-
     let gl_allFiles = [];
+
+    function getBrowserLanguage() {
+       const language = (window.navigator.languages && window.navigator.languages[0]) ||
+            window.navigator.language ||
+            window.navigator.userLanguage ||
+            window.navigator.browserLanguage;
+
+       return language;
+    }
+
+    // 言語設定が日本語なら日本語、それ以外は英語として返す
+    function getDisplayLanguage() {
+        let displayLanguage = "";
+        const browserLanguage = getBrowserLanguage();       
+        if (browserLanguage == "ja") {
+            displayLanguage = browserLanguage;
+        }
+        else {
+            displayLanguage = "en_US";
+        }
+
+        return displayLanguage;
+    }
+
+    
+
 
     function enableInputs(enable) {
        document.getElementById('miteneSource').disabled = !enable;
@@ -208,7 +230,23 @@ load ボタンを押してください<BR>
     });
 
     window.onload = function() {
+
+
         enableDownloadAllButton(false);
+
+        {
+           let message = "";
+
+           const displayLanguage = getDisplayLanguage();
+           if (displayLanguage == "ja") {
+              message = "みてねのソースの 3 行目（window.gonで始まる行）を以下にペーストして<BR>load ボタンを押してください<BR>"
+           }
+           else {
+              message = "Paste the third line of the Mitene source code, the line starting with window.gon.<BR>And press load button<BR>";
+           }
+
+           document.getElementById("description").innerHTML = message;
+        }
     }
 
 

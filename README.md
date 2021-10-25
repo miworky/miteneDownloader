@@ -8,6 +8,10 @@ Download jpg/mp4 files from mitene
       複数ページのファイルをダウンロードするには、複数回の操作が必要です。
 
 
+コードの説明はこちら：
+
+https://qiita.com/miworky/items/4d10824117527d115113
+
 
 # ●使用方法
 

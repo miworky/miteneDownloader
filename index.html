@@ -11,6 +11,7 @@
 
 <BR>
 <input type="button" value="Download All" onclick="onClickDownloadAll();" id="ButtonDownloadAll" />
+<input type="button" value="Copy To Clipboard" onclick="onClickCopyToClipboard();" id="ButtonCopyToClipBoard" />
 
 <label id="messageArea" ></label>
 
@@ -59,6 +60,7 @@
        document.getElementById('miteneSource').disabled = !enable;
        document.getElementById('ButtonLoad').disabled = !enable;
        document.getElementById('ButtonDownloadAll').disabled = !enable;
+       document.getElementById('ButtonCopyToClipBoard').disabled = !enable;
 
     }
 
@@ -79,6 +81,28 @@
         window.api.send("downloadAll", gl_allFiles );
     }
 
+    // ファイル一覧をクリップボードにコピーする
+    function onClickCopyToClipboard() {
+       let linkToFiles = document.getElementById('linkToFiles');
+
+       let listener = function(e){
+
+          e.clipboardData.setData("text/plain" , linkToFiles.innerText);    
+
+          // 本来のイベントをキャンセル
+          e.preventDefault();
+
+          // 終わったら削除
+          document.removeEventListener("copy", listener);
+       }
+
+      // コピーのイベントが発生したときに、クリップボードに書き込むようにしておく
+      document.addEventListener("copy" , listener);
+
+      // コピー
+      document.execCommand("copy");
+
+    }
 
 
     function fixFilename(string) {
@@ -117,7 +141,16 @@
       button.disabled = !enable;
     }
 
+    function enableCopyToClipBoardButton(enable) {
+      let button = document.getElementById('ButtonCopyToClipBoard');
+      button.disabled = !enable;
+    }
 
+    // 有効なリンクがあるときに押せるボタンの有効・無効を切り替える
+    function enableButtonWithValidLink(enable) {
+         enableDownloadAllButton(enable);
+         enableCopyToClipBoardButton(enable);
+    }
 
     function deleteAllLinks() {
          let linkToFiles = document.getElementById('linkToFiles');
@@ -138,8 +171,9 @@
 
          deleteContents();
 
-         // DownloadAllButtonを disable にする
-         enableDownloadAllButton(false);
+         // 有効なリンクがあるときに押せるボタンを disable にする
+         enableButtonWithValidLink(false);
+         
 
          // みてねのソースの内容を評価する
          let element = document.getElementById('miteneSource');
@@ -199,13 +233,13 @@
 
          }
 
-         // ファイルへのリンクが含まれていれば、DownloadAllButton を有効にする      
-         let isEnableDownloadAllButton = false;
+         // ファイルへのリンクが含まれていれば、有効なリンクがあるときに押せるボタン を有効にする      
+         let hasValidLink = false;
          if (0 < gl_allFiles.length) {
-            isEnableDownloadAllButton = true;
+            hasValidLink = true;
          }
 
-         enableDownloadAllButton(isEnableDownloadAllButton);
+         enableButtonWithValidLink(hasValidLink);
 
     }
 
@@ -232,7 +266,7 @@
     window.onload = function() {
 
 
-        enableDownloadAllButton(false);
+        enableButtonWithValidLink(false);
 
         {
            let message = "";

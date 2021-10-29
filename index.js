@@ -17,7 +17,7 @@ function createWindow () {
   mainWindow.setMenuBarVisibility(false);
 
   const package_name = "Mitene Downloader";
-  const package_version = "1.0.0";
+  const package_version = "1.1.0";
   const title = package_name + " " + package_version;
   mainWindow.setTitle(title);
 

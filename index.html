@@ -15,6 +15,8 @@
 
 <label id="messageArea" ></label>
 
+<A href="https://mitene.us/f/qbqJcdPvMR0/login">Login</a>
+
 <BR>
 <label id="linkToFiles" ></label>
 
@@ -81,13 +83,11 @@
         window.api.send("downloadAll", gl_allFiles );
     }
 
-    // ファイル一覧をクリップボードにコピーする
-    function onClickCopyToClipboard() {
-       let linkToFiles = document.getElementById('linkToFiles');
-
+    // textをクリップボードにコピーする
+    function copyToClipboard(text) {
        let listener = function(e){
 
-          e.clipboardData.setData("text/plain" , linkToFiles.innerText);    
+          e.clipboardData.setData("text/plain" , text);    
 
           // 本来のイベントをキャンセル
           e.preventDefault();
@@ -102,6 +102,14 @@
       // コピー
       document.execCommand("copy");
 
+
+    };
+
+    // ファイル一覧をクリップボードにコピーする
+    function onClickCopyToClipboard() {
+       let linkToFiles = document.getElementById('linkToFiles');
+       let textWithoutCopy = linkToFiles.innerText.replace(/copyToClipboard/g, '');  // 注意：これだと、ファイル名に含まれる copyToClipboard も消されてしまうのでなんとかしたい
+       copyToClipboard(textWithoutCopy);
     }
 
 
@@ -114,11 +122,21 @@
        return fixed2;
     }
 
-
+    function copyFileNameToClipboard(e) {
+       let fileName = this.name;
+       copyToClipboard(fileName);
+    };
 
     function makeLink(url, fileName, username){
 
       let linkToFiles = document.getElementById('linkToFiles');
+
+      let button = document.createElement('button');
+      button.type = 'button';
+      let buttonText = document.createTextNode('copyToClipboard');
+      button.appendChild(buttonText);
+      button.addEventListener("click", {name: fileName, handleEvent: copyFileNameToClipboard});
+      linkToFiles.appendChild( button );
 
 
       let a = document.createElement("A");
@@ -208,9 +226,10 @@
             if (mediaType === "photo") {
                url = urlPhoto;
                extention = ".jpg"
+               continue;
             }
             else if (mediaType === "movie") {
-               url = urlMovie;
+               url = urlMovie.replace("media_files_playlist", 'media_files') + "/download";
                extention = ".mp4"
             }
 

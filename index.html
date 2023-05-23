@@ -10,12 +10,16 @@
 <input type="button" value="load" onclick="onClickLoadButton();" id="ButtonLoad" />
 
 <BR>
-<input type="button" value="Download All" onclick="onClickDownloadAll();" id="ButtonDownloadAll" />
+<input type="button" value="Download All Photo" onclick="onClickDownloadAll();" id="ButtonDownloadAll" />
 <input type="button" value="Copy To Clipboard" onclick="onClickCopyToClipboard();" id="ButtonCopyToClipBoard" />
 
 <label id="messageArea" ></label>
 
 <A href="https://mitene.us/f/qbqJcdPvMR0/login">Login</a>
+
+<BR>
+Movie <input type="checkbox" value="Movie" onchange="onChangeMovie(this);" id="CheckboxMovie" checked />
+Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="CheckboxPhoto" checked />
 
 <BR>
 <label id="linkToFiles" ></label>
@@ -63,7 +67,22 @@
        document.getElementById('ButtonLoad').disabled = !enable;
        document.getElementById('ButtonDownloadAll').disabled = !enable;
        document.getElementById('ButtonCopyToClipBoard').disabled = !enable;
+    }
 
+    function onChangeMovie(value) {
+       onClickLoadButton();
+    }
+
+    function onChangePhoto(value) {
+       onClickLoadButton();
+    }
+
+    function isShowMovie() {
+       return document.getElementById('CheckboxMovie').checked;
+    }
+
+    function isShowPhoto() {
+       return document.getElementById('CheckboxPhoto').checked;
     }
 
     function startDownloading() {
@@ -164,10 +183,21 @@
       button.disabled = !enable;
     }
 
+    function enableMediaTypeCheckbox(enable) {
+       // 両方 false のときに disable にすると二度と enable にできない
+       if (!isShowMovie() && !isShowPhoto()) {
+          return;
+       }
+
+       document.getElementById('CheckboxMovie').disabled = !enable;
+       document.getElementById('CheckboxPhoto').disabled = !enable;
+    }
+
     // 有効なリンクがあるときに押せるボタンの有効・無効を切り替える
     function enableButtonWithValidLink(enable) {
          enableDownloadAllButton(enable);
          enableCopyToClipBoardButton(enable);
+         enableMediaTypeCheckbox(enable);
     }
 
     function deleteAllLinks() {
@@ -192,6 +222,8 @@
          // 有効なリンクがあるときに押せるボタンを disable にする
          enableButtonWithValidLink(false);
          
+         const showMovie = isShowMovie();
+         const showPhoto = isShowPhoto();
 
          // みてねのソースの内容を評価する
          let element = document.getElementById('miteneSource');
@@ -224,11 +256,18 @@
             let url;
             let extention;
             if (mediaType === "photo") {
+               if (!showPhoto) {
+                  continue;
+               }
+
                url = urlPhoto;
                extention = ".jpg"
-               continue;
             }
             else if (mediaType === "movie") {
+               if (!showMovie) {
+                  continue;
+               }
+
                url = urlMovie.replace("media_files_playlist", 'media_files') + "/download";
                extention = ".mp4"
             }

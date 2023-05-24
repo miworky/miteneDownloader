@@ -217,14 +217,17 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
          gl_allFiles = [];
     }
 
-    function getSameTookAtNum(tookAt, mediaFiles, mediaFileNo) {
+    // 与えられた撮影時刻と同じ撮影時刻のファイルの個数を返す
+    // 　調査対象：mediaFiles の先頭から mediaFileNo で指定された位置のひとつ前まで
+    // 同じ撮影時刻のファイルがなければ 0
+    function getSameTookAtNum(tookAt, mediaFiles, mediaFileNum) {
 
          let sameTookAt = 0;
 
-         for (let thisMediaFileNo = 0;thisMediaFileNo <= mediaFileNo;thisMediaFileNo++) {
-            const thisMediaFile = mediaFiles[thisMediaFileNo];
+         for (let mediaFileNo = 0;mediaFileNo < mediaFileNum;mediaFileNo++) {
+            const mediaFile = mediaFiles[mediaFileNo];
 
-            const thisTookAt = thisMediaFile["tookAt"];
+            const thisTookAt = mediaFile["tookAt"];
 
             if (thisTookAt === tookAt) {
                sameTookAt++;
@@ -235,11 +238,13 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
     }    
 
     function getPostTitle(sameTookAtNo) {
-        if (sameTookAtNo <= 1) {
+        if (sameTookAtNo <= 0) {
            return "";
         }
 
-        return "_" + sameTookAtNo.toString();
+        let nextSameTookAtNo = sameTookAtNo + 1;
+
+        return "_" + nextSameTookAtNo.toString();
     }
 
     function evalMitene() {
@@ -269,7 +274,7 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
             const thisMediaFile = mediaFiles[mediaFileNo];
             const uuid = thisMediaFile["uuid"];
             const tookAt = thisMediaFile["tookAt"];
-            const sameTookAtNo = getSameTookAtNum(tookAt, mediaFiles, mediaFileNo); // mediaFilesの 0 - mediaFilesNo までの間に同じ tookAt がいくつあるかを返す。同じのがほかになければ 1
+            const sameTookAtNo = getSameTookAtNum(tookAt, mediaFiles, mediaFileNo); // mediaFilesの 0 - mediaFilesNo までの間に同じ tookAt がいくつあるかを返す。同じのがほかになければ 0
             const hasComment = thisMediaFile["hasComment"];
             let title = "";
 

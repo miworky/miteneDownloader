@@ -318,10 +318,12 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
 
              const fileNameFixed = fixFilename(filename);
 
-            let file = {};
-            file["url"] = url;
-            file["filename"] = fileNameFixed;
-            gl_allFiles.push(file);
+            if (mediaType === "photo") {
+               let file = {};
+               file["url"] = url;
+               file["filename"] = fileNameFixed;
+               gl_allFiles.push(file);
+            }
 
             makeLink(url, fileNameFixed, username);
 

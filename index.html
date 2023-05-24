@@ -98,7 +98,16 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
     }
 
     function onClickDownloadAll(){
-        window.api.send("downloadAll", gl_allFiles );
+        // movie は現状は DL できないので Photo のみリストアップする
+        let photoFiles = [];
+
+        gl_allFiles.forEach(function(file) {
+           if (file["mediaType"] === "photo") {
+              photoFiles.push(file);
+           }
+        });
+
+        window.api.send("downloadAll", photoFiles );
     }
 
     function onClickLogin() {
@@ -220,12 +229,16 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
     // 与えられた撮影時刻と同じ撮影時刻のファイルの個数を返す
     // 　調査対象：mediaFiles の先頭から mediaFileNo で指定された位置のひとつ前まで
     // 同じ撮影時刻のファイルがなければ 0
+    //
+    // mediaFilesは撮影時刻の新しい順に並んでいるが、番号は古いほうから 0, 1, 2 と付けたいので、
+    // mediaFilesの後ろ側から探す
     function getSameTookAtNum(tookAt, mediaFiles, mediaFileNum) {
 
          let sameTookAt = 0;
 
-         for (let mediaFileNo = 0;mediaFileNo < mediaFileNum;mediaFileNo++) {
-            const mediaFile = mediaFiles[mediaFileNo];
+         const mediaFilesNum = mediaFiles.length;
+         for (let mediaFileNo = 0;mediaFileNo < mediaFilesNum - mediaFileNum - 1;mediaFileNo++) {
+            const mediaFile = mediaFiles[mediaFilesNum - mediaFileNo - 1];  // 後ろ側からみる
 
             const thisTookAt = mediaFile["tookAt"];
 
@@ -318,12 +331,11 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
 
              const fileNameFixed = fixFilename(filename);
 
-            if (mediaType === "photo") {
-               let file = {};
-               file["url"] = url;
-               file["filename"] = fileNameFixed;
-               gl_allFiles.push(file);
-            }
+             let file = {};
+             file["url"] = url;
+             file["filename"] = fileNameFixed;
+             file["mediaType"] = mediaType;
+             gl_allFiles.push(file);
 
             makeLink(url, fileNameFixed, username);
 

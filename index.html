@@ -15,7 +15,8 @@
 
 <label id="messageArea" ></label>
 
-<A href="https://mitene.us/f/qbqJcdPvMR0/login">Login</a>
+<input type="text" size="40" id="sharedURL" value="" />
+<input type="button" value="Login(first time only)" onclick="onClickLogin();" id="ButtonLogin" />
 
 <BR>
 Movie <input type="checkbox" value="Movie" onchange="onChangeMovie(this);" id="CheckboxMovie" checked />
@@ -60,8 +61,6 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
     }
 
     
-
-
     function enableInputs(enable) {
        document.getElementById('miteneSource').disabled = !enable;
        document.getElementById('ButtonLoad').disabled = !enable;
@@ -100,6 +99,11 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
 
     function onClickDownloadAll(){
         window.api.send("downloadAll", gl_allFiles );
+    }
+
+    function onClickLogin() {
+        let url = document.getElementById('sharedURL').value;
+        window.location.href = url;
     }
 
     // textをクリップボードにコピーする
@@ -213,6 +217,31 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
          gl_allFiles = [];
     }
 
+    function getSameTookAtNum(tookAt, mediaFiles, mediaFileNo) {
+
+         let sameTookAt = 0;
+
+         for (let thisMediaFileNo = 0;thisMediaFileNo <= mediaFileNo;thisMediaFileNo++) {
+            const thisMediaFile = mediaFiles[thisMediaFileNo];
+
+            const thisTookAt = thisMediaFile["tookAt"];
+
+            if (thisTookAt === tookAt) {
+               sameTookAt++;
+            }
+         }
+
+         return sameTookAt;
+    }    
+
+    function getPostTitle(sameTookAtNo) {
+        if (sameTookAtNo <= 1) {
+           return "";
+        }
+
+        return "_" + sameTookAtNo.toString();
+    }
+
     function evalMitene() {
          // すでに追加されているリンクは削除する
          deleteAllLinks();
@@ -240,6 +269,7 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
             const thisMediaFile = mediaFiles[mediaFileNo];
             const uuid = thisMediaFile["uuid"];
             const tookAt = thisMediaFile["tookAt"];
+            const sameTookAtNo = getSameTookAtNum(tookAt, mediaFiles, mediaFileNo); // mediaFilesの 0 - mediaFilesNo までの間に同じ tookAt がいくつあるかを返す。同じのがほかになければ 1
             const hasComment = thisMediaFile["hasComment"];
             let title = "";
 
@@ -272,7 +302,8 @@ Photo <input type="checkbox" value="Photo" onchange="onChangePhoto(this);" id="C
                extention = ".mp4"
             }
 
-            const filename = tookAt + "_" + title + extention;
+            const postTitle = getPostTitle(sameTookAtNo);
+            const filename = tookAt + "_" + title + postTitle + extention;
 
             let username;
             const userId = thisMediaFile["userId"];
